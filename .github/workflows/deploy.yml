@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Actions 탭에서 수동 실행도 가능
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Pages 활성화 (Settings 를 직접 안 건드려도 됨)
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: 의존성 설치
+        run: npm install --no-audit --no-fund
+
+      - name: 빌드
+        # base 를 레포 이름으로 맞춰야 /레포이름/ 하위에서 CSS·JS 를 찾는다
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: 사이트 주소 주입 (SEO 메타 · sitemap · robots)
+        run: |
+          SITE_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+          echo "사이트 주소: $SITE_URL"
+          find dist -type f \( -name '*.html' -o -name '*.xml' -o -name '*.txt' \) \
+            -exec sed -i "s|__SITE_URL__|$SITE_URL|g" {} +
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
