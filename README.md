@@ -6,11 +6,19 @@ React + 순수 CSS 애니메이션으로 만들었습니다.
 ## 뭘 할 수 있나요?
 
 - 무지개 그라데이션 똥 말랑이가 하늘에서 계속 떨어집니다 (좌우로 살랑살랑 + 빙글빙글)
-- 평소엔 젤리처럼 **말랑말랑** 숨을 쉽니다
-- 클릭/터치하면 납작 눌렸다가 **뻥!** 터지면서 무지개 반짝이가 튑니다
-- 비 세기 조절: `보슬보슬` / `적당히` / `똥폭우 🌧️`
+- 광택·음영·림라이트를 얹은 **젤리 3D 질감** — 진짜 구미젤리처럼 반들반들합니다
+- 표정이 7가지 (윙크 · 반달눈 · 놀람 · 졸림 · 메롱 · 하트눈 …) + 몇 초마다 눈을 깜빡입니다
+- 클릭/터치하면 납작 눌렸다가 **뻥!** 터지면서 반짝이 + 점수 팝업이 튑니다
+- **특수 말랑이**
+  - ✨ 황금똥 (+5): 금빛 글로우에 별이 반짝
+  - 💨 방귀똥 (−3): 김이 모락모락, 누르면 손해!
+  - 👑 왕똥 (+3): 크고 느긋한데 두 번 눌러야 터집니다 (한 대 맞으면 움찔)
+- **콤보**: 1.5초 안에 연달아 터뜨리면 5연속부터 ×2, 10연속부터 ×3
+- **⏱ 60초 챌린지**: 제한 시간 점수 대결 + 최고 기록 저장(`localStorage`) + 기록 공유 버튼
+- 효과음 (Web Audio 로 그때그때 생성 — 뽁!/띠링✨/뿌웅💨) + 모바일 진동, 음소거 토글
+- 비 세기 조절: `보슬보슬` / `적당히` / `똥폭우 🌧️` — 생성 간격·낙하 속도·최대 개수가 함께 바뀝니다
 - `쏟아붓기 🌈` 버튼 = 한 번에 16개 투하
-- 터뜨린 개수 점수판
+- **PWA**: 홈 화면에 설치해서 앱처럼 쓸 수 있습니다
 
 ## 지금 바로 보기 (설치 필요 없음)
 
@@ -39,20 +47,27 @@ npm run preview  # 빌드 결과 미리보기
 
 ```
 rainbow-poop-sky/
-├─ index.html              # Vite 진입점
-├─ standalone.html         # Node 없이 바로 보는 단일 파일 버전
+├─ index.html              # Vite 진입점 (SEO 메타 + PWA 연결)
+├─ standalone.html         # Node 없이 바로 보는 단일 파일 버전 (src 를 고치면 여기도 맞춰주기)
 ├─ vite.config.js
+├─ public/
+│  ├─ manifest.webmanifest # PWA 설치 정보
+│  ├─ favicon.svg          # 파비콘 (젤리 질감 버전)
+│  └─ icon-*.png           # PWA 아이콘 (192/512/maskable)
 └─ src/
    ├─ main.jsx
-   ├─ App.jsx              # 상태(점수·비 세기) + 레이어 조립
+   ├─ App.jsx              # 상태(점수·콤보·챌린지·비 세기) + 레이어 조립
    ├─ hooks/
-   │  └─ useFallingPoops.js  # 말랑이 생성/제거, 랜덤 성격 뽑기
+   │  ├─ useFallingPoops.js  # 말랑이 생성/제거, 종류·표정·성격 랜덤 뽑기
+   │  └─ useSound.js         # Web Audio 효과음 (파일 없이 코드로 생성)
    ├─ components/
    │  ├─ Sky.jsx           # 해 · 구름 · 언덕 배경
-   │  ├─ PoopSquishy.jsx   # 떨어지는 말랑이 1개 (클릭 → 터짐)
-   │  ├─ PoopArt.jsx       # 무지개똥 SVG 그림
-   │  ├─ Sparkles.jsx      # 터질 때 튀는 반짝이
-   │  └─ Hud.jsx           # 제목 · 점수판 · 조작 버튼
+   │  ├─ PoopSquishy.jsx   # 떨어지는 말랑이 1개 (클릭 → 터짐, 왕똥은 2타)
+   │  ├─ PoopArt.jsx       # 말랑이 SVG (젤리 질감 · 표정 7종 · 특수 3종)
+   │  ├─ Sparkles.jsx      # 터질 때 튀는 반짝이 (종류별 색)
+   │  ├─ ScorePop.jsx      # 터진 자리에 떠오르는 점수 숫자
+   │  ├─ ResultCard.jsx    # 60초 챌린지 결과 카드
+   │  └─ Hud.jsx           # 제목 · 점수판 · 콤보 배지 · 조작 버튼
    └─ styles/
       ├─ index.css         # 리셋
       └─ app.css           # 애니메이션 전부 여기
@@ -83,9 +98,15 @@ rainbow-poop-sky/
 | --- | --- |
 | 떨어지는 속도 | `useFallingPoops.js` 의 `duration: rand(6.5, 13)` |
 | 말랑이 크기 | 같은 파일 `size: rand(52, 118)` |
-| 비 세기 단계 | `App.jsx` 의 `LEVELS` |
-| 무지개 색 | `PoopArt.jsx` 의 `<linearGradient>` stop 들 |
+| 특수 말랑이 등장 확률 | 같은 파일 `SPECIALS` 의 `chance` |
+| 표정 등장 비율 | 같은 파일 `FACES` 의 `weight` |
+| 비 세기 단계 (간격·속도·최대 개수) | `App.jsx` 의 `LEVELS` |
+| 종류별 점수 | `App.jsx` 의 `POINTS` |
+| 콤보 유지 시간 · 배율 | `App.jsx` 의 `COMBO_WINDOW_MS`, `comboMultiplier` |
+| 무지개 색 | `PoopArt.jsx` 의 `GRADIENTS` |
+| 표정 추가 | `PoopArt.jsx` 의 `FACES` 에 그리기 + `useFallingPoops.js` 에 등록 |
 | 터지는 느낌 | `app.css` 의 `@keyframes squish` |
+| 효과음 | `useSound.js` 의 `tone(...)` 호출들 |
 | 하늘 색 | `app.css` 의 `.app` background |
 
 ## 배포 (GitHub Pages)
@@ -114,6 +135,7 @@ rainbow-poop-sky/
 | 크롤러 안내 | `public/robots.txt` |
 | 사이트맵 | `public/sitemap.xml` |
 | 파비콘 (무지개똥 SVG) | `public/favicon.svg` |
+| PWA 설치 (매니페스트 · 아이콘) | `public/manifest.webmanifest` + `public/icon-*.png` |
 | 구글 서치콘솔 소유권 확인 | `public/google*.html` (계정마다 1개) |
 
 `__SITE_URL__` 로 적힌 자리는 배포할 때 워크플로가 실제 주소로 자동 치환합니다.
