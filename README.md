@@ -95,11 +95,13 @@ rainbow-poop-sky/
 `main` 브랜치에 push 하면 `.github/workflows/deploy.yml` 이 자동으로 빌드 → 배포합니다.
 **로컬에 Node 가 없어도 됩니다.** 빌드는 GitHub Actions 서버에서 돌아가거든요.
 
-### 최초 1회 설정
+### 최초 1회 설정 (딱 한 번만)
 
-없습니다. 워크플로의 `actions/configure-pages` 단계가 Pages 를 알아서 켜줍니다.
-(혹시 권한 문제로 실패하면 레포 **Settings → Pages → Source** 를 **`GitHub Actions`** 로
-직접 바꾼 뒤 Actions 탭에서 워크플로를 다시 실행하세요.)
+레포 **Settings → Pages → Source** 를 **`GitHub Actions`** 로 바꿔주세요.
+이걸 안 하면 배포 단계에서 실패합니다.
+
+> 워크플로가 `actions/configure-pages` 로 이걸 자동화하려면 기본 `GITHUB_TOKEN` 에
+> 없는 권한이 필요해서, 수동 설정이 정석입니다.
 
 ### 검색 노출(SEO)을 위해 넣어둔 것
 

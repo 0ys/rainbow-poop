@@ -24,11 +24,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Pages 활성화 (Settings 를 직접 안 건드려도 됨)
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: 의존성 설치
         run: npm install --no-audit --no-fund
 
