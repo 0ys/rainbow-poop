@@ -114,6 +114,7 @@ rainbow-poop-sky/
 | 크롤러 안내 | `public/robots.txt` |
 | 사이트맵 | `public/sitemap.xml` |
 | 파비콘 (무지개똥 SVG) | `public/favicon.svg` |
+| 구글 서치콘솔 소유권 확인 | `public/googleac5b16a11c6c06a8.html` |
 
 `__SITE_URL__` 로 적힌 자리는 배포할 때 워크플로가 실제 주소로 자동 치환합니다.
 그래서 레포 이름이나 계정이 바뀌어도 손댈 필요가 없어요.
