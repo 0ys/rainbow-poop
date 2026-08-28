@@ -53,7 +53,8 @@ rainbow-poop-sky/
 ├─ public/
 │  ├─ manifest.webmanifest # PWA 설치 정보
 │  ├─ favicon.svg          # 파비콘 (젤리 질감 버전)
-│  └─ icon-*.png           # PWA 아이콘 (192/512/maskable)
+│  ├─ icon-*.png           # PWA 아이콘 (192/512/maskable)
+│  └─ qr.svg               # 설정 시트에 나오는 게임 주소 QR
 └─ src/
    ├─ main.jsx
    ├─ App.jsx              # 상태(점수·콤보·챌린지·비 세기) + 레이어 조립
@@ -67,7 +68,8 @@ rainbow-poop-sky/
    │  ├─ Sparkles.jsx      # 터질 때 튀는 반짝이 (종류별 색)
    │  ├─ ScorePop.jsx      # 터진 자리에 떠오르는 점수 숫자
    │  ├─ ResultCard.jsx    # 60초 챌린지 결과 카드
-   │  └─ Hud.jsx           # 제목 · 점수판 · 콤보 배지 · 조작 버튼
+   │  ├─ SettingsSheet.jsx # ⚙️ 설정: 소리 · 설명서 · QR · 만든 사람
+   │  └─ Hud.jsx           # 위: 제목·점수판·콤보 / 아래: 조작 독 / ⚙️ 버튼
    └─ styles/
       ├─ index.css         # 리셋
       └─ app.css           # 애니메이션 전부 여기

@@ -5,6 +5,7 @@ import PoopSquishy from './components/PoopSquishy.jsx'
 import Sparkles from './components/Sparkles.jsx'
 import ScorePop from './components/ScorePop.jsx'
 import ResultCard from './components/ResultCard.jsx'
+import SettingsSheet from './components/SettingsSheet.jsx'
 import useFallingPoops from './hooks/useFallingPoops.js'
 import useSound from './hooks/useSound.js'
 import './styles/app.css'
@@ -50,6 +51,7 @@ export default function App() {
   const [best, setBest] = useState(readBest)
   const [newBest, setNewBest] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const burstId = useRef(0)
   const combo = useRef({ count: 0, lastAt: 0 })
   const comboTimer = useRef(null)
@@ -135,18 +137,24 @@ export default function App() {
 
   const handlePop = useCallback(
     (spot) => {
-      const now = performance.now()
-      const c = combo.current
-      c.count = now - c.lastAt <= COMBO_WINDOW_MS ? c.count + 1 : 1
-      c.lastAt = now
-      const mult = comboMultiplier(c.count)
-
       const base = POINTS[spot.type] ?? 1
-      const value = base > 0 ? base * mult : base
+      let value
+      if (spot.type === 'fart') {
+        // 방귀똥: 점수만 깎이는 게 아니라 쌓아둔 콤보도 끊긴다
+        resetCombo()
+        value = base
+      } else {
+        const now = performance.now()
+        const c = combo.current
+        c.count = now - c.lastAt <= COMBO_WINDOW_MS ? c.count + 1 : 1
+        c.lastAt = now
+        value = base * comboMultiplier(c.count)
+        setComboCount(c.count)
+        clearTimeout(comboTimer.current)
+        comboTimer.current = setTimeout(resetCombo, COMBO_WINDOW_MS)
+      }
+      const mult = comboMultiplier(combo.current.count)
       setScore((s) => Math.max(0, s + value))
-      setComboCount(c.count)
-      clearTimeout(comboTimer.current)
-      comboTimer.current = setTimeout(resetCombo, COMBO_WINDOW_MS)
 
       const id = burstId.current++
       setBursts((prev) => [...prev, { ...spot, id }])
@@ -194,12 +202,15 @@ export default function App() {
         levels={LEVELS}
         mode={mode}
         timeLeft={timeLeft}
-        muted={muted}
         onLevelChange={setLevel}
         onShower={() => shower(16)}
         onStartChallenge={startChallenge}
-        onToggleMute={toggleMute}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
+
+      {settingsOpen && (
+        <SettingsSheet muted={muted} onToggleMute={toggleMute} onClose={() => setSettingsOpen(false)} />
+      )}
 
       {finished && (
         <ResultCard
